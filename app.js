@@ -3,6 +3,9 @@ const app= express(); //instance of express
 const port = 3003; //set port number
 const middleware= require('./middleware')
 const path =require('path')
+const bodyParser= require("body-parser");
+const mongoose= require("./database");
+
 
 //create server 
 const server = app.listen(port, () => console.log("server listening on port"+port ));
@@ -11,12 +14,16 @@ const server = app.listen(port, () => console.log("server listening on port"+por
 app.set("view engine","pug");
 app.set("views","views");
 
+app.use(bodyParser.urlencoded({extended:false}));
 app.use(express.static(path.join(__dirname,"public")));
 
 //Routes
-const loginRoute = require('./routes/loginRoutes');
+const loginRoute = require('./routes/loginRoutes'); 
+const registerRoute = require('./routes/registerRoutes'); 
 
 app.use("/login", loginRoute);
+app.use("/register", registerRoute);
+
 
 app.get("/",middleware.requireLogin,(req,res,next)=>{
     var payload = {

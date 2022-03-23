@@ -1,0 +1,34 @@
+extends layouts/login-layout.pug
+
+block content 
+    .loginContainer
+        H1 Register 
+        form#registerForm(method="post",onsubmit="event.preventDefault(); validateForm();")
+
+
+            p.errorMessage #{errorMessage}        
+
+            input(type="text", name="studentName",placeholder="Name", value= studentName , required="")
+            input(type="text", name="studentID",placeholder="ID", value= studentID , required="")
+            input(type="text", name="studentBatch",placeholder="Batch", value= studentBatch , required="")
+            input(type="text", name="studentBranch",placeholder="Brach", value= studentBranch , required="")
+            input(type="email", name="studentEmail",placeholder="Email", value= studentEmail , required="")
+            input#password(type="password", name ="studentPassword",placeholder="Password", required="")
+            input#passwordConf(type="password", name ="studentPasswordConf",placeholder="Confirm Password", required="")
+            input(type="submit",value="Login")
+        a(href="/Login") Already have an account? Login here.
+
+    script.
+        var passwordField = document.getElementById("password")
+        var passwordConfirmField = document.getElementById("passwordConf") 
+        var form= document.getElementById("registerForm")
+
+        function validateForm(){
+            if (passwordField.value != passwordConfirmField.value){
+                alert("Password Do not Match. Please try again. ")
+            }
+            else{
+                form.submit();
+            }
+        }
+
