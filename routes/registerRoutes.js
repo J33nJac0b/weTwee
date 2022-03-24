@@ -1,43 +1,76 @@
 const express = require('express');
-const { parse } = require('path');
-const app= express(); //instance of express
+const app = express();
 const router = express.Router();
-const bodyParser= require("body-parser");
+const bodyParser = require("body-parser")
+const bcrypt = require("bcrypt");
+const User = require('../schemas/UserSchema');
+ 
 
+app.set("view engine", "pug");
+app.set("views", "views");
 
-  
-//type of template engine
-app.set("view engine","pug");
-app.set("views","views");
+app.use(bodyParser.urlencoded({ extended: false }));
 
-app.use(bodyParser.urlencoded({extended:false})); //setting up the body parser
+router.get("/", (req, res, next) => {
 
-
-router.get("/",(req,res,next)=>{ 
     res.status(200).render("register");
 })
-router.post("/",(req,res,next)=>{ 
-    //var studentName = req.body.studentName.trim();
-    var studentName = req.body.studentName;
-    var studentID = req.body.studentID;
-    var studentBatch = req.body.studentBatch;
-    var studentBranch = req.body.studentBranch;
-    var studentEmail = req.body.studenEmail;
-    var studentPassword = req.body.studentPassword;
+  
+router.post("/", async (req, res, next) => {
+  
+  var studentName =req.body.studentName;
+  var studentEmail =req.body.studentEmail ;
+  var studentID =req.body.studentID;
+  var studentBatch =req.body.studentBatch;
+  var studentBranch =req.body.studentBranch;
+  var studentPassword = req.body.studentPassword;
 
+  var payload = req.body;
 
+  if(studentName && studentEmail && studentID && studentBatch && studentBranch && studentPassword){
+    var user = await User.findOne({
+      $or: [
+          { studentEmail: studentEmail },
+          { studentID: studentID }
+      ]
+  })
+  .catch((error) => {
+      console.log(error);
+      payload.errorMessage = "Something went wrong.";
+      res.status(200).render("register", payload);
+  });
 
-    var payload = req.body;
-    
-    if ( studentName && studentID && studentBatch && studentBranch && studentEmail && studentPassword){
+      
 
+  if(user == null) {
+    // No user found
+
+    var data = req.body;
+
+    data.studentPassword = await bcrypt.hash(studentPassword, 10);
+
+    User.create(data)
+    .then((user) => {
+        req.session.user = user;
+        return res.redirect("/")
+    })
+}
+  else {
+    // User found
+    if (studentEmail == user.studentEmail) {
+        payload.errorMessage = "Email already in use.";
     }
-
-    else{
-        payload.errorMessage = "Make sure each field has a valid value.";
-        res.status(200).render("register",payload);
+    else {
+        payload.errorMessage = "Register ID already in use.";
     }
-   
+    res.status(200).render("register", payload);
+  }
+
+}
+else {
+    payload.errorMessage = "Make sure each field has a valid value.";
+    res.status(200).render("register", payload);
+}
 })
 
 module.exports = router;
