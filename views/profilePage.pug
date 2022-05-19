@@ -51,6 +51,8 @@ block content
                     a(href=`/profile/${profileUser.username}/followers`)
                         span#followersValue.value #{followersCount}
                         span Followers
+                    if profileUser.username == "admin"
+                        a(href="/register") Register Users here.
         .tabsContainer
             +createTab("Posts", `/profile/${profileUser.username}`, selectedTab != "replies")
             +createTab("Replies", `/profile/${profileUser.username}/replies`, selectedTab == "replies")
