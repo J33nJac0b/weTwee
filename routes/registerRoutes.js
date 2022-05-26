@@ -22,11 +22,11 @@ router.post("/", async (req, res, next) => {
     var username = req.body.username.trim();
     var email = req.body.email.trim();
     var password = req.body.password;
-    var mode = req.body.mode;
+    var role=req.body.role;
 
     var payload = req.body;
 
-    if(firstName && lastName && username && email && password ) {
+if(firstName && lastName && username && email && password && role) {
         var user = await User.findOne({
             $or: [
                 { username: username },
@@ -47,7 +47,7 @@ router.post("/", async (req, res, next) => {
             User.create(data)
             .then((user) => {
                 req.session.user = user;
-                return res.redirect("/");
+                return res.redirect("login");
             })
         }
         else {
@@ -59,12 +59,6 @@ router.post("/", async (req, res, next) => {
                 payload.errorMessage = "Username already in use.";
             }
             res.status(200).render("register", payload);
-        }
-        if (user.mode == "admin"){
-            mode="teacher";
-        }
-        else{
-            mode ="student";
         }
     }
     else {
