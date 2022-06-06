@@ -47,11 +47,11 @@ if(firstName && lastName && username && email && password && role) {
             User.create(data)
             .then((user) => {
                 req.session.user = user;
-                return res.redirect("login");
+                return res.redirect("register");
             })
         }
         else {
-            // User found
+            // User found 
             if (email == user.email) {
                 payload.errorMessage = "Email already in use.";
             }
